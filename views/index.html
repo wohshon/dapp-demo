@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="images/redhat.png">
+
+    <title>Ethereum demo</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="css/extra/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/starter-template.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="js/extra/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="js/extra/html5shiv.min.js"></script>
+      <script src="js/extra/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Ethereum Demo</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+
+      <div class="starter-template">
+        <div class="row">
+          <div class="col-md-4"></div>
+          <div class="form-group col-md-4">
+            <label for="accountAddr">Account</label>
+            <input type="text" class="form-control" value="0xa7129ba8dffd19869ec6d408e9866d43935c5099" id="accountAddr" placeholder="e.g. 0xa7129ba8dffd19869ec6d408e9866d43935c5099">
+          </div>
+          <div class="col-md-4"></div>
+        </div> <!--row-->
+        <input class="btn btn-default" type="button" id="btn_getPoints" value="Get Points">
+
+        <h3>Reward points : </h3>
+        <table class="table table-bordered" id="tbl1">
+          <thead align="center">
+            <tr>
+              <th>#</th>
+              <th>account</th>
+              <th>balance</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <p class="lead"><div id="points"></div></p>
+
+        <h3>Transfer Points : </h3>
+        <div class="row">
+          <div class="col-md-4">
+            <input type="text" class="form-control" value="0xa7129ba8dffd19869ec6d408e9866d43935c5099" id="senderAddr" placeholder="sender">
+          </div>
+          <div class="col-md-4">
+            <input type="text" class="form-control" value="0xee260f385168413b3a9dc63e89e4ef092dfba96c" id="recvAddr" placeholder="receiver">
+          </div>
+          <div class="col-md-3">
+            <input type="text" class="form-control" value="" id="sendValue" placeholder="1000000">
+          </div>
+          <div class="col-md-1">
+            <input class="btn btn-default" type="button" id="btn_send" value="Send">
+          </div>
+        </div> <!--row-->
+
+
+      </div> <!-- starter template-->
+
+    </div><!-- /.container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/web3.min.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/app1.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+
+    <script>window.jQuery || document.write('<script src="js/jquery-3.2.1.min.js"><\/script>')</script>
+    <script src="js/bootstrap.min.js"></script>
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/extra/ie10-viewport-bug-workaround.js"></script>
+    <script>
+	$( document ).ready(function() {
+		Log.log('horray');
+    myApp.init();
+    //var acct='0xa7129ba8dffd19869ec6d408e9866d43935c5099';
+    $('#btn_getPoints').on('click', function(event) {
+      console.log("clicked");
+      myApp.showPointBalance($('#accountAddr').val());
+    });
+    $('#btn_send').on('click', function(event) {
+      console.log("clicked");
+      myApp.send($('#senderAddr').val(),$('#recvAddr').val(),$('#sendValue').val());
+    });
+
+    for (i=0; i < myApp.config.etheAccounts.length;i++) {
+      console.log(myApp.config.etheAccounts[i]);
+
+        var r='<tr><td>'+(i+1)+'</td><td class="acct_row" id="acct_'+myApp.config.etheAccounts[i]+'">'+myApp.config.etheAccounts[i]+'</td><td id="bal_'+myApp.config.etheAccounts[i]+'"> - </td></tr>';
+
+        $('#tbl1 tbody').append(r);
+    }
+    $( '.acct_row' ).on('click', function(event) {
+      //console.log(" row clicked "+Object.keys(event));
+      console.log(" row clicked "+$('#'+event.target.id).html());
+      $('#accountAddr').val($('#'+event.target.id).html());
+    });
+    var acct=$('#accountAddr').val();
+    console.log('account:'+acct);
+    //myApp.showPointBalance(acct);
+
+	});
+    </script>
+  </body>
+</html>

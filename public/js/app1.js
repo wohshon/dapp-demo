@@ -1,0 +1,81 @@
+var testConfig = {
+	etheURL:'http://192.168.223.196:8545',
+	etheContractAddr:'0x2235ccb11d75a6ea1d84ab4bab1f510fd73d7310',
+	etheAccounts: ["0xa7129ba8dffd19869ec6d408e9866d43935c5099", "0xee260f385168413b3a9dc63e89e4ef092dfba96c", "0xe0ef3c3819b86347378d807a0db2d7d076e471bc", "0x77bb2b01347bbc285ee23f66359667b1124dbeed", "0x4023dab12f9e86146cdbc24e00f79373eac9d958", "0xee12ad3c761b97bb12d7571ab86293a89c66efd2"],
+	etheCoinbase: '0xa7129ba8dffd19869ec6d408e9866d43935c5099',
+	tokenContractInterface : '[{"constant":false,"inputs":[{"name":"receiver","type":"address"},{"name":"amount","type":"uint256"}],"name":"sendCoin","outputs":[{"name":"sufficient","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"coinBalanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[{"name":"supply","type":"uint256"}],"payable":false,"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"sender","type":"address"},{"indexed":false,"name":"receiver","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"CoinTransfer","type":"event"}]'
+}
+
+var ocpConfig = {
+	etheURL:'http://pvt-wohshon-test.apps.dev.openshift.opentlc.com',
+	etheContractAddr:'0xae0094ec873be1ae4825766c6b1be4ab50188b28',
+	etheAccounts: ["0xa7129ba8dffd19869ec6d408e9866d43935c5099", "0xee260f385168413b3a9dc63e89e4ef092dfba96c", "0xe0ef3c3819b86347378d807a0db2d7d076e471bc", "0x77bb2b01347bbc285ee23f66359667b1124dbeed", "0x4023dab12f9e86146cdbc24e00f79373eac9d958", "0xee12ad3c761b97bb12d7571ab86293a89c66efd2"],
+	etheCoinbase: '0xa7129ba8dffd19869ec6d408e9866d43935c5099',
+	tokenContractInterface : '[{"constant":false,"inputs":[{"name":"receiver","type":"address"},{"name":"amount","type":"uint256"}],"name":"sendCoin","outputs":[{"name":"sufficient","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"coinBalanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[{"name":"supply","type":"uint256"}],"payable":false,"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"sender","type":"address"},{"indexed":false,"name":"receiver","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"CoinTransfer","type":"event"}]'
+}
+
+	var myApp = {
+		config: testConfig,
+	init: function() {
+		 var web3 = new Web3(new Web3.providers.HttpProvider(this.config.etheURL));
+		 var abi = JSON.parse(this.config.tokenContractInterface);
+		 var tokenContract = web3.eth.contract(abi);
+		 this.contractInstance = tokenContract.at(this.config.etheContractAddr);
+		 console.log(" got contract object "+Object.keys(myApp.contractInstance));
+		 //"_eth", "transactionHash", "address", "abi", "sendCoin", "coinBalanceOf", "allEvents", "CoinTransfer"]
+	},
+	showPointBalance: function(account) {
+
+		var url="/getBalance"
+//		var payload= '{"account": "'+this.config.etheCoinbase+'", "config":'+JSON.stringify(this.config)+' }'
+		var payload= '{"account": "'+account+'", "config":'+JSON.stringify(this.config)+' }'
+		$.ajax({
+		  type: "POST",
+		  url: url,
+			data: payload,
+			success: this.showBalance,
+			headers: {
+	 		  "Access-Control-Allow-Origin": "*" ,
+	 		 "Access-Control-Allow-Headers": "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With",
+	 		 "Access-Control-Allow-Methods": "GET, PUT, POST",
+	 		 "Content-type": "application/json"
+	 		},
+		  dataType: 'json',
+			error: function(e) {
+		    //console.log("error "+Object.keys(e));
+				console.log("error "+e.responseText);
+		  }
+		});
+
+	},
+	showBalance:function(response) {
+		console.log("success " + Object.keys(response));
+		console.log("success " + response.account);
+		$('#bal_'+response.account).html(response.balance);
+	},
+	send : function (sender, receiver, value) {
+		var url="/send";
+		var payload= '{"sender": "'+sender+'","receiver": "'+receiver+'","value": "'+value+'", "config":'+JSON.stringify(this.config)+' }'
+		$.ajax({
+			type: "POST",
+			url: url,
+			data: payload,
+			success: function(data) {
+            $('#points').html('Tx done, wait for tx to be committed');
+        },
+			headers: {
+				"Access-Control-Allow-Origin": "*" ,
+			 "Access-Control-Allow-Headers": "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With",
+			 "Access-Control-Allow-Methods": "GET, PUT, POST",
+			 "Content-type": "application/json"
+			},
+			dataType: 'json',
+			error: function(e) {
+				//console.log("error "+Object.keys(e));
+				console.log("error "+e.responseText);
+			}
+		});
+	},
+	contractInstance: null
+
+}

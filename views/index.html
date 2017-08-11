@@ -56,17 +56,50 @@
     </nav>
 
     <div class="container">
-
+      <div id="banner-ok" class="alert alert-success alert-dismissable fade in" style="display:none;">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <strong>Connected!</strong>
+      </div>
       <div class="starter-template">
+        <h4>Demo only works with docker images at <a href='https://hub.docker.com/r/wohshon/go-ethereum/'>wohshon/go-ethereum</a> tags: alpine-private, alpine-bootnode</h4>
+        <h4>Image is pre-populated with accounts, the sample token contract <a href='https://github.com/ethereum/go-ethereum/wiki/Contract-Tutorial'>here</a> needs to be deployed</h4>
+        <h3>&nbsp;</h3>
+        <label for="accountAddr">Enter private chain endpoint</label>
+
         <div class="row">
-          <div class="col-md-4"></div>
-          <div class="form-group col-md-4">
-            <label for="accountAddr">Account</label>
+          <div class="col-md-3"></div>
+          <div class="form-group col-md-5">
+            <input type="text" class="form-control" value="http://pvt-wohshon-test.apps.dev.openshift.opentlc.com" id="privateChainEndpoint" placeholder="e.g. http://pvt-wohshon-test.apps.dev.openshift.opentlc.com">
+          </div>
+          <div class="col-md-1">
+              <input class="btn btn-default" type="button" id="btn_connect" value="Connect">
+          </div>
+          <div class="col-md-3"></div>
+
+        </div>
+        <div class="row">
+          <div class="col-md-3"></div>
+          <div class="form-group col-md-5">
+            <input type="text" class="form-control" value="" id="contractAddr" placeholder="will be auto populated, overwrite if needed">
+          </div>
+          <div class="col-md-1">
+              <input class="btn btn-default" type="button" id="btn_update_addr" value="Update">
+          </div>
+          <div class="col-md-3"></div>
+
+
+        <label for="accountAddr">Click on an account number below to populate the text field</label>
+        <div class="row">
+          <div class="col-md-3"></div>
+          <div class="form-group col-md-5">
             <input type="text" class="form-control" value="0xa7129ba8dffd19869ec6d408e9866d43935c5099" id="accountAddr" placeholder="e.g. 0xa7129ba8dffd19869ec6d408e9866d43935c5099">
           </div>
-          <div class="col-md-4"></div>
+          <div class="col-md-1">
+              <input class="btn btn-default" type="button" id="btn_getPoints" value="Get Points">
+          </div>
+          <div class="col-md-3"></div>
         </div> <!--row-->
-        <input class="btn btn-default" type="button" id="btn_getPoints" value="Get Points">
+
 
         <h3>Reward points : </h3>
         <table class="table table-bordered" id="tbl1">
@@ -82,17 +115,18 @@
         <p class="lead"><div id="points"></div></p>
 
         <h3>Transfer Points : </h3>
+        <label>drag accounts from above into the sender and receiver boxes</label>
         <div class="row">
           <div class="col-md-4">
-            <input type="text" class="form-control" value="0xa7129ba8dffd19869ec6d408e9866d43935c5099" id="senderAddr" placeholder="sender">
+            <input type="text" class="form-control"  ondrop="myApp.drop(event)" ondragover="myApp.allowDrop(event)" value="" id="senderAddr" placeholder="sender">
           </div>
           <div class="col-md-4">
-            <input type="text" class="form-control" value="0xee260f385168413b3a9dc63e89e4ef092dfba96c" id="recvAddr" placeholder="receiver">
+            <input type="text" class="form-control" ondrop="myApp.drop(event)" ondragover="myApp.allowDrop(event)" value="" id="recvAddr" placeholder="receiver">
           </div>
-          <div class="col-md-3">
+          <div class="col-md-2">
             <input type="text" class="form-control" value="" id="sendValue" placeholder="1000000">
           </div>
-          <div class="col-md-1">
+          <div class="col-md-2">
             <input class="btn btn-default" type="button" id="btn_send" value="Send">
           </div>
         </div> <!--row-->
@@ -129,22 +163,44 @@
       console.log("clicked");
       myApp.send($('#senderAddr').val(),$('#recvAddr').val(),$('#sendValue').val());
     });
-
-    for (i=0; i < myApp.config.etheAccounts.length;i++) {
-      console.log(myApp.config.etheAccounts[i]);
-
-        var r='<tr><td>'+(i+1)+'</td><td class="acct_row" id="acct_'+myApp.config.etheAccounts[i]+'">'+myApp.config.etheAccounts[i]+'</td><td id="bal_'+myApp.config.etheAccounts[i]+'"> - </td></tr>';
-
-        $('#tbl1 tbody').append(r);
-    }
-    $( '.acct_row' ).on('click', function(event) {
-      //console.log(" row clicked "+Object.keys(event));
-      console.log(" row clicked "+$('#'+event.target.id).html());
-      $('#accountAddr').val($('#'+event.target.id).html());
+    $('#btn_update_addr').on('click', function(event) {
+      console.log("clicked update addr ");
+      myApp.config.etheContractAddr=$('#contractAddr').val();
     });
-    var acct=$('#accountAddr').val();
-    console.log('account:'+acct);
-    //myApp.showPointBalance(acct);
+    $('#btn_connect').on('click', function(event) {
+      console.log("clicked - connect"+myApp.envConfigs.length);
+      //load config
+      for (i=0; i< myApp.envConfigs.length;i++) {
+        if (myApp.envConfigs[i].etheURL==$('#privateChainEndpoint').val()) {
+          myApp.config=myApp.envConfigs[i];
+
+        }
+
+      }
+      if (myApp.config.etheContractAddr!=null) {
+        $('#contractAddr').val(myApp.config.etheContractAddr);
+      }
+      $('#banner-ok').show().fadeOut(2000);
+      $('#btn_update_addr').prop('disabled',false);
+      $('#tbl1 tbody').empty();
+      for (i=0; i < myApp.config.etheAccounts.length;i++) {
+        console.log(myApp.config.etheAccounts[i]);
+
+          var r='<tr><td>'+(i+1)+'</td><td class="acct_row" draggable="true" ondragstart="myApp.drag(event)" id="acct_'+myApp.config.etheAccounts[i]+'">'+myApp.config.etheAccounts[i]+'</td><td id="bal_'+myApp.config.etheAccounts[i]+'"> - </td></tr>';
+
+          $('#tbl1 tbody').append(r);
+      }
+      $( '.acct_row' ).on('click', function(event) {
+        //console.log(" row clicked "+Object.keys(event));
+        console.log(" row clicked "+$('#'+event.target.id).html());
+        $('#accountAddr').val($('#'+event.target.id).html());
+        $('#accountAddr').fadeOut(100).fadeIn(300);
+      });
+      var acct=$('#accountAddr').val();
+      console.log('account:'+acct);
+      //myApp.showPointBalance(acct);
+
+    });
 
 	});
     </script>

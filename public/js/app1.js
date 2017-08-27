@@ -47,9 +47,17 @@ var CONFIG={TEST:0, OCP:1};
 				etheAccounts: ["0xa7129ba8dffd19869ec6d408e9866d43935c5099", "0xee260f385168413b3a9dc63e89e4ef092dfba96c", "0xe0ef3c3819b86347378d807a0db2d7d076e471bc", "0x77bb2b01347bbc285ee23f66359667b1124dbeed", "0x4023dab12f9e86146cdbc24e00f79373eac9d958", "0xee12ad3c761b97bb12d7571ab86293a89c66efd2"],
 				etheCoinbase: '0xa7129ba8dffd19869ec6d408e9866d43935c5099',
 				tokenContractInterface : '[{"constant":false,"inputs":[{"name":"receiver","type":"address"},{"name":"amount","type":"uint256"}],"name":"sendCoin","outputs":[{"name":"sufficient","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"coinBalanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[{"name":"supply","type":"uint256"}],"payable":false,"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"sender","type":"address"},{"indexed":false,"name":"receiver","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"CoinTransfer","type":"event"}]'
+			},
+			{
+				etheURL:'dummy',
+				etheContractAddr:null,
+				etheAccounts: ["0xa7129ba8dffd19869ec6d408e9866d43935c5099", "0xee260f385168413b3a9dc63e89e4ef092dfba96c", "0xe0ef3c3819b86347378d807a0db2d7d076e471bc", "0x77bb2b01347bbc285ee23f66359667b1124dbeed", "0x4023dab12f9e86146cdbc24e00f79373eac9d958", "0xee12ad3c761b97bb12d7571ab86293a89c66efd2"],
+				etheCoinbase: '0xa7129ba8dffd19869ec6d408e9866d43935c5099',
+				tokenContractInterface : '[{"constant":false,"inputs":[{"name":"receiver","type":"address"},{"name":"amount","type":"uint256"}],"name":"sendCoin","outputs":[{"name":"sufficient","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"coinBalanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[{"name":"supply","type":"uint256"}],"payable":false,"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"sender","type":"address"},{"indexed":false,"name":"receiver","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"CoinTransfer","type":"event"}]'
 			}
 	],
-		config: testConfig,
+		//config: testConfig,
+		config: null,
 		//config: this.envConfigs[0],
 	init: function() {
 		$('#btn_update_addr').prop('disabled',true);
